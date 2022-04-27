@@ -3,6 +3,8 @@ import "./App.css";
 
 import Container from "@mui/material/Container";
 
+import { MapContainer, TileLayer, useMap, Marker, Popup } from "react-leaflet";
+
 import InfoCard from "./InfoCard";
 // https://developer.foursquare.com/reference/place-details
 // https://developer.foursquare.com/reference/place-tips
@@ -54,7 +56,7 @@ function App() {
       // var url =
       //   "https://api.foursquare.com/v3/places/search?ll=45.433633,9.208001&radius=100000&limit=25&sort=distance";
       var url =
-        "https://api.foursquare.com/v3/places/search?radius=100000&limit=5&sort=distance";
+        "https://api.foursquare.com/v3/places/search?radius=100000&limit=25&sort=distance";
       await fetch(url, options)
         .then((response) => response.json())
         .then((response) => {

@@ -20,11 +20,47 @@ import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
 
+import { MapContainer, TileLayer, useMap, Marker, Popup } from "react-leaflet";
 // import DetailsModal from "./DetailsModal";
 
 export default function InfoCard(props) {
+  var element = props.element;
+  var id = props.id;
+  const dates = [
+    "",
+    "Monday: ",
+    "Tuesday: ",
+    "Wednesday: ",
+    "Thursday: ",
+    "Friday: ",
+    "Saturday: ",
+    "Sunday: ",
+  ];
+
+  const [isItemFav, setIsItemFav] = useState(false);
+  const [open, setOpen] = useState(false);
+
+  const [website, setWebsite] = useState("");
+  const [tel, setTel] = useState("");
+  const [popularHours, setPopularHours] = useState([]);
+  const [hasPopularHours, setHasPopularHours] = useState(false);
+
+  const handleClickOpen = () => {
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+  };
+  console.log(element);
+  let distanceText = "Distance: " + element["distance"].toString() + "m";
+
+  let iconCategory =
+    element["categories"][0]["icon"]["prefix"] +
+    "bg_32" +
+    element["categories"][0]["icon"]["suffix"];
+
   useEffect(() => {
-    //no hace nada aquí*
     const fetchDetails = async () => {
       const options = {
         method: "GET",
@@ -33,36 +69,35 @@ export default function InfoCard(props) {
           Authorization: "fsq3i9kwIT71lD8Ta2qgw60a7bCxO/9nNrw9fCapnuSFRoU=",
         },
       };
-      var url = "https://api.foursquare.com/v3/places/" + element["fsq_id"];
+      var url =
+        "https://api.foursquare.com/v3/places/" +
+        element["fsq_id"] +
+        "?fields=tel,website,hours_popular";
       await fetch(url, options)
         .then((response) => response.json())
         .then((response) => {
-          console.log(response);
+          //   console.log(response);
+          if (response["website"]) {
+            setWebsite(response["website"]);
+          } else {
+            setWebsite("No website provided.");
+          }
+
+          if (response["tel"]) {
+            setTel(response["tel"]);
+          } else {
+            setTel("No telephone provided.");
+          }
+
+          if (response["hours_popular"]) {
+            setHasPopularHours(true);
+            setPopularHours(response["hours_popular"]);
+          }
         })
         .catch((err) => console.error(err));
     };
     fetchDetails();
   }, []);
-
-  var element = props.element;
-  var id = props.id;
-
-  const [isItemFav, setIsItemFav] = useState(false);
-  const [open, setOpen] = useState(false);
-  const handleClickOpen = () => {
-    setOpen(true);
-  };
-
-  const handleClose = () => {
-    setOpen(false);
-  };
-
-  let distanceText = "Distance: " + element["distance"].toString() + "m";
-
-  let iconCategory =
-    element["categories"][0]["icon"]["prefix"] +
-    "bg_32" +
-    element["categories"][0]["icon"]["suffix"];
 
   return (
     <>
@@ -79,7 +114,6 @@ export default function InfoCard(props) {
           src={element["pictureLinks"][0]}
           alt={element["name"]}
         />
-        {/* {console.log(element)} */}
 
         <CardContent>
           <Box
@@ -148,8 +182,37 @@ export default function InfoCard(props) {
             Address: {element["location"]["formatted_address"]},
           </DialogContentText>
           <DialogContentText id="alert-dialog-description">
-            {distanceText}
+            Website: {website}
           </DialogContentText>
+          <DialogContentText id="alert-dialog-description">
+            Telephone: {tel}
+          </DialogContentText>
+          <div>
+            Most visited hours:
+            {hasPopularHours ? (
+              <div>
+                {popularHours.map((element, id) => {
+                  return (
+                    <div key={id}>
+                      {dates[element["day"]]}
+                      {element["open"].substring(
+                        0,
+                        element["open"].length - 2
+                      )}{" "}
+                      -{" "}
+                      {element["close"].substring(
+                        0,
+                        element["close"].length - 2
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            ) : (
+              <div>Not provided.</div>
+            )}
+          </div>
+
           <ImageList sx={{ width: 500, height: 450 }} cols={3} rowHeight={164}>
             {element["pictureLinks"].map((item, id) => (
               <ImageListItem key={id}>
@@ -162,6 +225,29 @@ export default function InfoCard(props) {
               </ImageListItem>
             ))}
           </ImageList>
+          <div>
+            <MapContainer
+              center={[
+                element["geocodes"]["main"]["latitude"],
+                element["geocodes"]["main"]["longitude"],
+              ]}
+              zoom={15}
+              scrollWheelZoom={true}
+            >
+              <TileLayer
+                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+              />
+              <Marker
+                position={[
+                  element["geocodes"]["main"]["latitude"],
+                  element["geocodes"]["main"]["longitude"],
+                ]}
+              >
+                <Popup>{element["name"]}</Popup>
+              </Marker>
+            </MapContainer>
+          </div>
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose}>Close</Button>
