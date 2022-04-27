@@ -1,13 +1,9 @@
 import { useState, useEffect } from "react";
 import "./App.css";
-
+import { Link } from "react-router-dom";
 import Container from "@mui/material/Container";
-
-import { MapContainer, TileLayer, useMap, Marker, Popup } from "react-leaflet";
-
+import FavPlaces from "./FavPlaces";
 import InfoCard from "./InfoCard";
-// https://developer.foursquare.com/reference/place-details
-// https://developer.foursquare.com/reference/place-tips
 
 function App() {
   const [queryValues, setQueryValues] = useState(null);
@@ -78,6 +74,7 @@ function App() {
   return (
     <Container>
       <h1>Location Advisor</h1>
+      {/* <Link to="/favourite">TO FAV</Link> */}
       <hr></hr>
 
       {queryValues ? (
