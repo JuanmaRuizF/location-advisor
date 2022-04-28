@@ -1,85 +1,76 @@
 import { useState, useEffect } from "react";
-import "./App.css";
+import "./Styles/App.css";
 import { Link } from "react-router-dom";
 import Container from "@mui/material/Container";
-import FavPlaces from "./FavPlaces";
-import InfoCard from "./InfoCard";
+import Slider from "./Components/UserInputComponent/SliderComponent";
+import FavPlaces from "./Components/FavPlacesComponent";
+import InfoCard from "./Components/CardComponent";
+import ReactPaginate from "react-paginate";
+import { options } from "./utils";
 
 function App() {
   const [queryValues, setQueryValues] = useState(null);
-  const [pictures, setPictures] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [loaded, setLoaded] = useState(false);
 
-  const options = {
-    method: "GET",
-    headers: {
-      Accept: "application/json",
-      Authorization: "fsq3i9kwIT71lD8Ta2qgw60a7bCxO/9nNrw9fCapnuSFRoU=",
-    },
+  const fetchPictures = async (element) => {
+    let pictures = [];
+    let url =
+      "https://api.foursquare.com/v3/places/" +
+      element.fsq_id +
+      "/photos?limit=5";
+
+    await fetch(url, options)
+      .then((response) => response.json())
+      .then((response) => {
+        response.map((element) => {
+          pictures.push(element.prefix + "200x200" + element.suffix);
+        });
+      })
+      .catch((err) => console.error(err));
+    // console.log(pictures);
+    return pictures;
   };
 
-  const fetchPictures = async (response) => {
-    let updated_response = response;
-    let url;
-
-    updated_response["results"].map(async (element) => {
-      url =
-        "https://api.foursquare.com/v3/places/" +
-        element["fsq_id"] +
-        "/photos?limit=5";
-
-      await fetch(url, options)
-        .then((response) => response.json())
-        .then((response) => {
-          var singleElement = [];
-          response.map((element, index) => {
-            singleElement.push(
-              element["prefix"] + "200x200" + element["suffix"]
-            );
-          });
-          element["pictureLinks"] = singleElement;
-        })
-        .then(() => {
-          setPictures(response);
-          setQueryValues(updated_response);
-        })
-        .catch((err) => console.error(err));
-    });
+  const fetchData = async () => {
+    // var url =
+    //   "https://api.foursquare.com/v3/places/search?ll=45.433633,9.208001&radius=100000&limit=25&sort=distance";
+    var url =
+      "https://api.foursquare.com/v3/places/search?radius=100000&limit=25&ll=42.433633,9.208001";
+    await fetch(url, options)
+      .then((response) => response.json())
+      .then((response) => {
+        response.results.map(async (e) => {
+          e.pictureLinks = await fetchPictures(e);
+        });
+        return response;
+      })
+      .then((response) => {
+        setQueryValues(response);
+      })
+      .catch((err) => console.error(err));
   };
 
-  useEffect(() => {
-    const fetchData = async () => {
-      // var url =
-      //   "https://api.foursquare.com/v3/places/search?ll=45.433633,9.208001&radius=100000&limit=25&sort=distance";
-      var url =
-        "https://api.foursquare.com/v3/places/search?radius=100000&limit=25&sort=distance";
-      await fetch(url, options)
-        .then((response) => response.json())
-        .then((response) => {
-          response["results"].map((e) => {
-            e["pictureLinks"] = [];
-          });
-          fetchPictures(response);
-        })
-        .then(() => {
-          setLoading(false);
-        })
-        .catch((err) => console.error(err));
-    };
-    fetchData();
-
-    //ll=40.827958,-73.916035&radius=100000 query=cafe&
-  }, []);
-
+  // console.log(queryValues);
   return (
     <Container>
       <h1>Location Advisor</h1>
-      {/* <Link to="/favourite">TO FAV</Link> */}
-      <hr></hr>
+      <Link to="/favourite">TO FAV</Link>
+      <button
+        onClick={async () => {
+          await fetchData().then(() => {
+            setLoaded(true);
+          });
+        }}
+      >
+        Cargar
+      </button>
 
-      {queryValues ? (
+      <Slider></Slider>
+      <hr></hr>
+      {loaded ? (
         <div className="resultGrid">
-          {queryValues["results"].map((element, id) => {
+          {/* {console.log(queryValues)} */}
+          {queryValues.results.map((element, id) => {
             return <InfoCard key={id} element={element} id={id}></InfoCard>;
           })}
         </div>
