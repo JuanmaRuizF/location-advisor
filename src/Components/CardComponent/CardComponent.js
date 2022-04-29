@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import Card from "@mui/material/Card";
 import CardHeader from "@mui/material/CardHeader";
 import CardMedia from "@mui/material/CardMedia";
@@ -17,10 +17,39 @@ export default function CardComponent(props) {
     id,
     iconCategory,
     distanceText,
-    isItemFav,
-    setIsItemFav,
+    // isItemFav,
+    // setIsItemFav,
     handleClickOpen,
+    setNumberFavs,
   } = props;
+
+  const [isItemFav, setIsItemFav] = useState(false);
+
+  useEffect(() => {
+    let favItems = JSON.parse(localStorage.favElements);
+    if (element.fsq_id in favItems) {
+      setIsItemFav(true);
+    }
+  }, []);
+  const handleFav = () => {
+    //as the useState will be updated later, we have to treat them inverselly ->
+    // the functionality for adding to fav will be in the condition if it is still false
+
+    if (isItemFav) {
+      setIsItemFav(false);
+      let favItems = JSON.parse(localStorage.favElements);
+      delete favItems[element.fsq_id];
+      localStorage.setItem("favElements", JSON.stringify(favItems));
+      setNumberFavs(Object.keys(JSON.parse(localStorage.favElements)).length);
+    } else {
+      setIsItemFav(true);
+      let favItems = JSON.parse(localStorage.favElements);
+      favItems[element.fsq_id] = element.fsq_id;
+      localStorage.setItem("favElements", JSON.stringify(favItems));
+      setNumberFavs(Object.keys(JSON.parse(localStorage.favElements)).length);
+    }
+    // console.log(localStorage.getItem("favElements"));
+  };
 
   return (
     <Card sx={{ maxWidth: 345 }} key={id}>
@@ -29,8 +58,7 @@ export default function CardComponent(props) {
         title={element.name}
         subheader={element.categories[0].name}
       />
-      {/* {console.log("element:", props.element.pictureLinks)} */}
-      {element && element.pictureLinks ? (
+      {element && element.pictureLinks ? ( //checks if there are pictures, just in case they are not provided
         <CardMedia
           component="img"
           height="200"
@@ -61,14 +89,18 @@ export default function CardComponent(props) {
         {isItemFav ? (
           <IconButton
             aria-label="take from favorites"
-            onClick={() => setIsItemFav(false)}
+            onClick={() => {
+              handleFav();
+            }}
           >
             <FavoriteIcon color="error" />
           </IconButton>
         ) : (
           <IconButton
             aria-label="add to favorites"
-            onClick={() => setIsItemFav(true)}
+            onClick={() => {
+              handleFav();
+            }}
           >
             <FavoriteIcon />
           </IconButton>

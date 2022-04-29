@@ -9,7 +9,7 @@ export default function InfoCard(props) {
     "Distance: " + element.distance.toString() + "m"
   );
   const [loaded, setLoaded] = useState(false);
-  const [isItemFav, setIsItemFav] = useState(false);
+
   const [open, setOpen] = useState(false);
 
   const [website, setWebsite] = useState("");
@@ -72,9 +72,10 @@ export default function InfoCard(props) {
             id={props.id}
             iconCategory={iconCategory}
             distanceText={distanceText}
-            isItemFav={isItemFav}
-            setIsItemFav={setIsItemFav}
+            // isItemFav={isItemFav}
+            // setIsItemFav={setIsItemFav}
             handleClickOpen={handleClickOpen}
+            setNumberFavs={props.setNumberFavs}
           ></CardComponent>
 
           <DetailsCardComponent
