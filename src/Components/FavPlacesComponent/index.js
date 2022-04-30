@@ -1,15 +1,15 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import { Container } from "@mui/material/";
 import { options } from "../../utils";
 import InfoCard from "../CardComponent";
-import { ConnectingAirportsOutlined } from "@mui/icons-material";
+import "../../Styles/App.css";
 
 export default function FavPlaces() {
   const [queryValues, setQueryValues] = useState([]);
   const [loaded, setLoaded] = useState(false);
   const [numberFavs, setNumberFavs] = useState(0);
-  // let items = [];
+
   useEffect(() => {
     if (!localStorage.favElements) {
       setNumberFavs(0);
@@ -18,52 +18,41 @@ export default function FavPlaces() {
       setNumberFavs(Object.keys(JSON.parse(localStorage.favElements)).length);
     }
   }, []);
-  const fetchPictures = async (element) => {
-    let pictures = [];
-    let url =
-      "https://api.foursquare.com/v3/places/" +
-      element.fsq_id +
-      "/photos?limit=5";
-
-    await fetch(url, options)
-      .then((response) => response.json())
-      .then((response) => {
-        response.map((element) => {
-          pictures.push(element.prefix + "200x200" + element.suffix);
-        });
-      })
-      .catch((err) => console.error(err));
-    // console.log(pictures);
-    return pictures;
-  };
-
-  const fetchData = async (fsq_id) => {
-    var url = "https://api.foursquare.com/v3/places/" + fsq_id;
-    var arrayResults;
-
-    await fetch(url, options)
-      .then((response) => response.json())
-      .then(async (response) => {
-        response.pictureLinks = await fetchPictures(response);
-        arrayResults = response;
-
-        // elements.push(response);
-      })
-      .catch((err) => console.error(err));
-
-    return arrayResults;
-  };
 
   useEffect(() => {
+    const fetchData = async (favItems) => {
+      favItems.map(async (fsq_id) => {
+        let url = "https://api.foursquare.com/v3/places/" + fsq_id;
+        await fetch(url, options)
+          .then((response) => response.json())
+          .then(async (response) => {
+            console.log(response);
+            let pictures = [];
+            let url_pictures =
+              "https://api.foursquare.com/v3/places/" +
+              response.fsq_id +
+              "/photos?limit=5";
+            response.pictureLinks = await fetch(url_pictures, options)
+              .then((response) => response.json())
+              .then((response) => {
+                response.map((element) => {
+                  pictures.push(element.prefix + "200x200" + element.suffix);
+                });
+                return pictures;
+              })
+              .catch((err) => console.error(err));
+            return response;
+          })
+          .then((response) => {
+            setQueryValues((oldArray) => [...oldArray, response]);
+          })
+
+          .catch((err) => console.error(err));
+      });
+    };
+
     let favItems = Object.keys(JSON.parse(localStorage.favElements));
-
-    let items = [];
-
-    favItems.map(async (fsq_id) => {
-      items.push(await fetchData(fsq_id));
-    });
-    setQueryValues(items);
-
+    fetchData(favItems);
     setLoaded(true);
   }, []);
 
@@ -72,40 +61,25 @@ export default function FavPlaces() {
       <Container>
         <h1>Favourite places</h1>
         <Link to="/">TO MAIN PAGE</Link>
-        {queryValues.map((e, key) => {
-          console.log(key);
-          console.log(e);
-        })}
-        {console.log(queryValues)}
-        {/* {console.log(queryValues)} */}
-        {/* <div className="resultGrid">
-          {queryValues.map((e) => {
-            return <div>{console.log(e)}</div>;
-          })}
-        </div> */}
+        <div className="resultGrid">
+          {queryValues.length > 1
+            ? queryValues.map((element, key) => {
+                console.log(element);
+                return (
+                  <InfoCard
+                    key={key}
+                    element={element}
+                    id={key}
+                    setNumberFavs={setNumberFavs}
+                    isFavPage={true}
+                  ></InfoCard>
+                );
+              })
+            : null}
+        </div>
       </Container>
     );
   } else {
-    return (
-      <Container>
-        <h3>Loading...</h3>
-      </Container>
-    );
+    return <h3>Loading...</h3>;
   }
 }
-//  {queryValues ? (
-//             <div>
-//               {queryValues.map((element, id) => {
-//                 return (
-//                   <InfoCard
-//                     key={id}
-//                     element={element}
-//                     id={id}
-//                     setNumberFavs={setNumberFavs}
-//                   ></InfoCard>
-//                 );
-//               })}
-//             </div>
-//           ) : (
-//             <div></div>
-//           )}

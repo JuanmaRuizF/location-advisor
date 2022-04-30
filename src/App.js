@@ -9,7 +9,7 @@ import { options } from "./utils";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 
 function App() {
-  const [queryValues, setQueryValues] = useState(null);
+  const [queryValues, setQueryValues] = useState([]);
   const [loaded, setLoaded] = useState(false);
 
   const [numberFavs, setNumberFavs] = useState(0);
@@ -33,37 +33,72 @@ function App() {
     }
   }, []);
 
-  const fetchPictures = async (element) => {
-    let pictures = [];
-    let url =
-      "https://api.foursquare.com/v3/places/" +
-      element.fsq_id +
-      "/photos?limit=5";
+  // const fetchPictures = async (element) => {
+  //   let pictures = [];
+  //   let url =
+  //     "https://api.foursquare.com/v3/places/" +
+  //     element.fsq_id +
+  //     "/photos?limit=5";
 
-    await fetch(url, options)
-      .then((response) => response.json())
-      .then((response) => {
-        response.map((element) => {
-          pictures.push(element.prefix + "200x200" + element.suffix);
-        });
-      })
-      .catch((err) => console.error(err));
-    return pictures;
-  };
+  //   await fetch(url, options)
+  //     .then((response) => response.json())
+  //     .then((response) => {
+  //       response.map((element) => {
+  //         pictures.push(element.prefix + "200x200" + element.suffix);
+  //       });
+  //     })
+  //     .catch((err) => console.error(err));
+  //   return pictures;
+  // };
+
+  // const fetchData = async () => {
+  //   await fetch(urlCreation(), options)
+  //     .then((response) => response.json())
+  //     .then((response) => {
+  //       response.results.map(async (e) => {
+  //         e.pictureLinks = await fetchPictures(e);
+  //       });
+  //       return response;
+  //     })
+  //     .then((response) => {
+  //       setQueryValues(response);
+  //     })
+  //     .catch((err) => console.error(err));
+  // };
 
   const fetchData = async () => {
     await fetch(urlCreation(), options)
       .then((response) => response.json())
-      .then((response) => {
-        response.results.map(async (e) => {
-          e.pictureLinks = await fetchPictures(e);
+      .then(async (response) => {
+        let mapElement = response.results;
+
+        mapElement.map(async (element) => {
+          let pictures = [];
+          let url_pictures =
+            "https://api.foursquare.com/v3/places/" +
+            element.fsq_id +
+            "/photos?limit=5";
+
+          element.pictureLinks = await fetch(url_pictures, options)
+            .then((response) => response.json())
+            .then((response) => {
+              response.map((element) => {
+                pictures.push(element.prefix + "200x200" + element.suffix);
+              });
+              return pictures;
+            });
+          // .catch((err) => console.error(err));
+          return response;
+          //         }}
         });
-        return response;
       })
       .then((response) => {
-        setQueryValues(response);
+        setQueryValues((oldArray) => [...oldArray, response]);
       })
+
       .catch((err) => console.error(err));
+
+    setLoaded(true);
   };
 
   return (
@@ -93,16 +128,18 @@ function App() {
       {loaded ? (
         <div className="resultGrid">
           {/* {console.log(queryValues)} */}
-          {queryValues.results.map((element, id) => {
-            return (
-              <InfoCard
-                key={id}
-                element={element}
-                id={id}
-                setNumberFavs={setNumberFavs}
-              ></InfoCard>
-            );
-          })}
+          {queryValues.length > 1
+            ? queryValues.results.map((element, id) => {
+                return (
+                  <InfoCard
+                    key={id}
+                    element={element}
+                    id={id}
+                    setNumberFavs={setNumberFavs}
+                  ></InfoCard>
+                );
+              })
+            : null}
         </div>
       ) : (
         <div>Loading...</div>

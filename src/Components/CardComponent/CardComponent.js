@@ -10,6 +10,7 @@ import Typography from "@mui/material/Typography";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import InfoIcon from "@mui/icons-material/Info";
 import { Box } from "@mui/material";
+import { useNavigate } from "react-router-dom";
 
 export default function CardComponent(props) {
   const {
@@ -17,13 +18,16 @@ export default function CardComponent(props) {
     id,
     iconCategory,
     distanceText,
+
     // isItemFav,
     // setIsItemFav,
     handleClickOpen,
     setNumberFavs,
+    isFavPage,
   } = props;
 
   const [isItemFav, setIsItemFav] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     let favItems = JSON.parse(localStorage.favElements);
@@ -31,6 +35,8 @@ export default function CardComponent(props) {
       setIsItemFav(true);
     }
   }, []);
+
+  useEffect(() => {});
   const handleFav = () => {
     //as the useState will be updated later, we have to treat them inverselly ->
     // the functionality for adding to fav will be in the condition if it is still false
@@ -41,12 +47,18 @@ export default function CardComponent(props) {
       delete favItems[element.fsq_id];
       localStorage.setItem("favElements", JSON.stringify(favItems));
       setNumberFavs(Object.keys(JSON.parse(localStorage.favElements)).length);
+      if (isFavPage) {
+        navigate(0);
+      }
     } else {
       setIsItemFav(true);
       let favItems = JSON.parse(localStorage.favElements);
       favItems[element.fsq_id] = element.fsq_id;
       localStorage.setItem("favElements", JSON.stringify(favItems));
       setNumberFavs(Object.keys(JSON.parse(localStorage.favElements)).length);
+      if (isFavPage) {
+        navigate(0);
+      }
     }
     // console.log(localStorage.getItem("favElements"));
   };
@@ -79,10 +91,11 @@ export default function CardComponent(props) {
             pb: 1,
           }}
         >
-          <Avatar src={iconCategory}></Avatar>
-          <Typography variant="body2" color="text.secondary">
-            {distanceText}
-          </Typography>
+          {!isFavPage ? (
+            <Typography variant="body2" color="text.secondary">
+              {distanceText}
+            </Typography>
+          ) : null}
         </Box>
       </CardContent>
       <CardActions disableSpacing>

@@ -5,9 +5,9 @@ import { options } from "../../utils";
 
 export default function InfoCard(props) {
   const [element] = useState(props.element);
-  const [distanceText] = useState(
-    "Distance: " + element.distance.toString() + "m"
-  );
+  const isFavPage = props.isFavPage;
+  const [distanceText, setDistanceText] = useState(0);
+
   const [loaded, setLoaded] = useState(false);
 
   const [open, setOpen] = useState(false);
@@ -59,6 +59,10 @@ export default function InfoCard(props) {
         .catch((err) => console.error(err));
     };
 
+    if (!isFavPage) {
+      setDistanceText("Distance: " + element.distance.toString() + "m");
+    }
+
     fetchDetails();
     setLoaded(true);
   }, []);
@@ -76,6 +80,7 @@ export default function InfoCard(props) {
             // setIsItemFav={setIsItemFav}
             handleClickOpen={handleClickOpen}
             setNumberFavs={props.setNumberFavs}
+            isFavPage={isFavPage}
           ></CardComponent>
 
           <DetailsCardComponent
