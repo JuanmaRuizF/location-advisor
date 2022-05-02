@@ -1,6 +1,5 @@
 import React from "react";
-import ImageList from "@mui/material/ImageList";
-import ImageListItem from "@mui/material/ImageListItem";
+import { ImageList, ImageListItem } from "@mui/material/";
 
 export default function ImageListCardComponent(props) {
   const element = props.element;

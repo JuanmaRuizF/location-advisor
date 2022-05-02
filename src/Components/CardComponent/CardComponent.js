@@ -9,7 +9,7 @@ import IconButton from "@mui/material/IconButton";
 import Typography from "@mui/material/Typography";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import InfoIcon from "@mui/icons-material/Info";
-import { Box } from "@mui/material";
+import { Box, Rating } from "@mui/material";
 
 export default function CardComponent(props) {
   const {
@@ -25,6 +25,7 @@ export default function CardComponent(props) {
   const [isItemFav, setIsItemFav] = useState(false);
 
   useEffect(() => {
+    //this is used to check if the element is set as favourite, so it will display the fav button in red
     let favItems = JSON.parse(localStorage.favElements);
     if (element.fsq_id in favItems) {
       setIsItemFav(true);
@@ -52,11 +53,15 @@ export default function CardComponent(props) {
   };
 
   return (
-    <Card sx={{ maxWidth: 345 }} key={id}>
+    <Card
+      // sx={({ maxWidth: 210 }, { maxHeight: 500 })}
+      key={id}
+    >
       <CardHeader
         avatar={<Avatar src={iconCategory}></Avatar>}
         title={element.name}
         subheader={element.categories[0].name}
+        className="tt"
       />
       {element && element.photos ? ( //checks if there are pictures, just in case they are not provided
         <CardMedia
@@ -85,6 +90,15 @@ export default function CardComponent(props) {
             </Typography>
           ) : null}
         </Box>
+      </CardContent>
+      <CardContent className="rating">
+        {/* rating is provided /10, so divide it to display it in the 5* rating component */}
+        <Rating
+          readOnly
+          name="half-rating"
+          defaultValue={element.rating / 2}
+          precision={0.1}
+        />
       </CardContent>
       <CardActions disableSpacing>
         {isItemFav ? (

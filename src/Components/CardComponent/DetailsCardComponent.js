@@ -26,6 +26,7 @@ export default function DetailsCardComponent(props) {
     popularHours,
   } = props;
 
+  //used to display the popular hours timetable
   const dates = [
     "",
     "Monday: ",
@@ -36,12 +37,14 @@ export default function DetailsCardComponent(props) {
     "Saturday: ",
     "Sunday: ",
   ];
+
   return (
     <Dialog
       open={open}
       onClose={handleClose}
       aria-labelledby="alert-dialog-title"
       aria-describedby="alert-dialog-description"
+      maxWidth="lg"
     >
       <DialogTitle id="alert-dialog-title">
         <Box
@@ -70,6 +73,9 @@ export default function DetailsCardComponent(props) {
         </DialogContentText>
         <DialogContentText id="alert-dialog-description">
           Telephone: {tel}
+        </DialogContentText>
+        <DialogContentText id="alert-dialog-description">
+          Rating: {element.rating / 2} / 5
         </DialogContentText>
         <div>
           Most visited hours:
