@@ -12,6 +12,7 @@ export default function FavPlaces() {
   const [numberFavs, setNumberFavs] = useState(0);
   const [tempValues, setTempValues] = useState([]);
 
+  //gets the fav numbers
   useEffect(() => {
     if (!localStorage.favElements) {
       setNumberFavs(0);
@@ -21,6 +22,8 @@ export default function FavPlaces() {
     }
   }, []);
 
+  //this is done every time the numberFavs is changed -> if someone deletes it from the page, it will fetch the data again.
+  //It calls the API with every id in the localstorage and stores the result that will be mapped.
   useEffect(() => {
     const fetchData = async (favItems) => {
       var arrayValues = [];
@@ -29,7 +32,7 @@ export default function FavPlaces() {
         let url =
           "https://api.foursquare.com/v3/places/" +
           fsq_id +
-          "?&fields=photos,categories,name,geocodes,location,distance,tel,website,hours_popular,fsq_id";
+          "?&fields=photos,categories,name,geocodes,location,distance,tel,website,hours_popular,fsq_id,rating";
         await fetch(url, options)
           .then((response) => response.json())
           .then((response) => {
@@ -44,6 +47,8 @@ export default function FavPlaces() {
     fetchData(favItems);
   }, [numberFavs]);
 
+  //this will be only done if there has been a change in the numberFavs -> it will trigger fetch with the new data and it is stored in the tempValues, so this code is executed
+  //this method is done to prepare the pictures syntax to match the one required in the other components.
   useEffect(() => {
     if (
       tempValues.length ===
@@ -78,19 +83,21 @@ export default function FavPlaces() {
 
       <hr></hr>
       {loaded ? (
-        <div className="resultGrid">
+        <Grid container className="gridContainer">
           {queryValues.map((element, key) => {
             return (
-              <InfoCard
-                key={key}
-                element={element}
-                id={key}
-                setNumberFavs={setNumberFavs}
-                isFavPage={true}
-              ></InfoCard>
+              <Grid item className="gridItem" key={key}>
+                <InfoCard
+                  key={key}
+                  element={element}
+                  id={key}
+                  setNumberFavs={setNumberFavs}
+                  isFavPage={true}
+                ></InfoCard>
+              </Grid>
             );
           })}
-        </div>
+        </Grid>
       ) : (
         <div className="loadingComponent">
           <CircularProgress size="8rem" />
