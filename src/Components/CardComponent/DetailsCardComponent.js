@@ -90,11 +90,10 @@ export default function DetailsCardComponent(props) {
           )}
         </div>
 
-        {element && element.pictureLinks ? (
-          <ImageListCardComponent element={element}></ImageListCardComponent>
-        ) : (
-          <div></div>
-        )}
+        <ImageListCardComponent
+          element={element.photos}
+        ></ImageListCardComponent>
+
         <div>
           <MapCardComponent element={element}></MapCardComponent>
         </div>

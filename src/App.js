@@ -1,28 +1,20 @@
 import { useState, useEffect } from "react";
 import "./Styles/App.css";
 import { Link } from "react-router-dom";
-import { Container, Badge } from "@mui/material/";
-import Slider from "./Components/UserInputComponent/SliderComponent";
-import FavPlaces from "./Components/FavPlacesComponent";
+import { Container, Badge, Grid, CircularProgress } from "@mui/material/";
 import InfoCard from "./Components/CardComponent";
 import { options } from "./utils";
 import FavoriteIcon from "@mui/icons-material/Favorite";
+import UserInputComponent from "./Components/UserInputComponent";
 
 function App() {
   const [queryValues, setQueryValues] = useState([]);
   const [loaded, setLoaded] = useState(false);
 
+  const [fetchUrl, setFetchUrl] = useState(
+    "https://api.foursquare.com/v3/places/search?radius=100000&ll=27.983375,-15.691567&limit=10&fields=photos,categories,name,geocodes,location,distance,tel,website,hours_popular,fsq_id"
+  );
   const [numberFavs, setNumberFavs] = useState(0);
-  const [valueDistance, setValueDistance] = useState(50);
-
-  const urlCreation = () => {
-    // var url =
-    //   "https://api.foursquare.com/v3/places/search?ll=45.433633,9.208001&radius=100000&limit=25&sort=distance";
-    var url =
-      "https://api.foursquare.com/v3/places/search?radius=100000&limit=25&ll=42.433633,9.208001";
-
-    return url;
-  };
 
   useEffect(() => {
     if (!localStorage.favElements) {
@@ -33,103 +25,63 @@ function App() {
     }
   }, []);
 
-  // const fetchPictures = async (element) => {
-  //   let pictures = [];
-  //   let url =
-  //     "https://api.foursquare.com/v3/places/" +
-  //     element.fsq_id +
-  //     "/photos?limit=5";
-
-  //   await fetch(url, options)
-  //     .then((response) => response.json())
-  //     .then((response) => {
-  //       response.map((element) => {
-  //         pictures.push(element.prefix + "200x200" + element.suffix);
-  //       });
-  //     })
-  //     .catch((err) => console.error(err));
-  //   return pictures;
-  // };
-
-  // const fetchData = async () => {
-  //   await fetch(urlCreation(), options)
-  //     .then((response) => response.json())
-  //     .then((response) => {
-  //       response.results.map(async (e) => {
-  //         e.pictureLinks = await fetchPictures(e);
-  //       });
-  //       return response;
-  //     })
-  //     .then((response) => {
-  //       setQueryValues(response);
-  //     })
-  //     .catch((err) => console.error(err));
-  // };
-
   const fetchData = async () => {
-    await fetch(urlCreation(), options)
+    await fetch(fetchUrl, options)
       .then((response) => response.json())
-      .then(async (response) => {
-        let mapElement = response.results;
+      .then((response) => {
+        let editedResponse = response.results;
 
-        mapElement.map(async (element) => {
-          let pictures = [];
-          let url_pictures =
-            "https://api.foursquare.com/v3/places/" +
-            element.fsq_id +
-            "/photos?limit=5";
-
-          element.pictureLinks = await fetch(url_pictures, options)
-            .then((response) => response.json())
-            .then((response) => {
-              response.map((element) => {
-                pictures.push(element.prefix + "200x200" + element.suffix);
-              });
-              return pictures;
-            });
-          // .catch((err) => console.error(err));
-          return response;
-          //         }}
+        editedResponse.map((element) => {
+          let res = [];
+          element["photos"].map((img) => {
+            res.push(img.prefix + "200x200" + img.suffix);
+          });
+          element.photos = res;
         });
+        return editedResponse;
       })
       .then((response) => {
-        setQueryValues((oldArray) => [...oldArray, response]);
+        console.log(response);
+        setQueryValues(response);
+        setLoaded(true);
       })
-
       .catch((err) => console.error(err));
-
-    setLoaded(true);
   };
+
+  useEffect(() => {
+    setLoaded(false);
+    fetchData();
+  }, [fetchUrl]);
+
+  console.log(queryValues);
 
   return (
     <Container>
-      <h1>Location Advisor</h1>
-
-      <Link to="/favourite">
-        <Badge badgeContent={numberFavs} color="primary">
-          <FavoriteIcon color="error" sx={{ fontSize: 35 }} />
-        </Badge>
-      </Link>
-      <button
-        onClick={async () => {
-          await fetchData().then(() => {
-            setLoaded(true);
-          });
-        }}
-      >
-        Cargar
-      </button>
-
-      <Slider
-        valueDistance={valueDistance}
-        setValueDistance={setValueDistance}
-      ></Slider>
+      <Grid container spacing={2}>
+        <Grid item xs={6}>
+          <h1>Location Advisor</h1>
+        </Grid>
+        <Grid item xs={6}>
+          <Link to="/favourite">
+            <h1 className="favButton">
+              <Badge badgeContent={numberFavs} color="primary">
+                <FavoriteIcon color="error" sx={{ fontSize: 35 }} />
+              </Badge>
+            </h1>
+          </Link>
+        </Grid>
+      </Grid>
+      <hr className="separatingBar"></hr>
+      <UserInputComponent
+        fetchUrl={fetchUrl}
+        setFetchUrl={setFetchUrl}
+      ></UserInputComponent>
       <hr></hr>
       {loaded ? (
         <div className="resultGrid">
-          {/* {console.log(queryValues)} */}
-          {queryValues.length > 1
-            ? queryValues.results.map((element, id) => {
+          {loaded
+            ? queryValues.map((element, id) => {
+                // console.log(queryValues);
                 return (
                   <InfoCard
                     key={id}
@@ -138,11 +90,14 @@ function App() {
                     setNumberFavs={setNumberFavs}
                   ></InfoCard>
                 );
+                // console.log(element.pictureLinks);
               })
             : null}
         </div>
       ) : (
-        <div>Loading...</div>
+        <div className="loadingComponent">
+          <CircularProgress size="8rem" />
+        </div>
       )}
     </Container>
   );

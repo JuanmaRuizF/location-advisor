@@ -31,39 +31,30 @@ export default function InfoCard(props) {
     element.categories[0].icon.suffix;
 
   useEffect(() => {
-    const fetchDetails = async () => {
-      var url =
-        "https://api.foursquare.com/v3/places/" +
-        element.fsq_id +
-        "?fields=tel,website,hours_popular";
-      await fetch(url, options)
-        .then((response) => response.json())
-        .then((response) => {
-          if (response.website) {
-            setWebsite(response.website);
-          } else {
-            setWebsite("No website provided.");
-          }
+    const detailVerification = () => {
+      if (element.website) {
+        setWebsite(element.website);
+      } else {
+        setWebsite("No website provided.");
+      }
 
-          if (response.tel) {
-            setTel(response.tel);
-          } else {
-            setTel("No telephone provided.");
-          }
+      if (element.tel) {
+        setTel(element.tel);
+      } else {
+        setTel("No telephone provided.");
+      }
 
-          if (response.hours_popular) {
-            setHasPopularHours(true);
-            setPopularHours(response.hours_popular);
-          }
-        })
-        .catch((err) => console.error(err));
+      if (element.hours_popular) {
+        setHasPopularHours(true);
+        setPopularHours(element.hours_popular);
+      }
     };
 
     if (!isFavPage) {
       setDistanceText("Distance: " + element.distance.toString() + "m");
     }
 
-    fetchDetails();
+    detailVerification();
     setLoaded(true);
   }, []);
 
@@ -76,8 +67,6 @@ export default function InfoCard(props) {
             id={props.id}
             iconCategory={iconCategory}
             distanceText={distanceText}
-            // isItemFav={isItemFav}
-            // setIsItemFav={setIsItemFav}
             handleClickOpen={handleClickOpen}
             setNumberFavs={props.setNumberFavs}
             isFavPage={isFavPage}
