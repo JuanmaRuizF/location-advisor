@@ -1,21 +1,24 @@
 import React, { useState } from "react";
-import DistanceSlider from "./DistanceSliderComponent";
 import { Grid, Button } from "@mui/material/";
+
+import DistanceSlider from "./DistanceSliderComponent";
 import SortByComponent from "./SortByComponent";
 import MapCoordinatesComponent from "./MapCoordinatesComponent";
 import NumberElementsSliderComponent from "./NumberElementsSliderComponent";
-import "../../Styles/App.css";
 
 export default function UserInputComponent(props) {
-  const { fetchUrl, setFetchUrl } = props;
+  const { setFetchUrl } = props;
+  //values for the user inputs
   const [valueDistance, setValueDistance] = useState(50);
   const [numberElements, setNumberElements] = useState(25);
   const [valueSorted, setValueSorted] = useState("relevance");
   const [latlong, setLatlong] = useState(",");
   const [errorSearch, setErrorSearch] = useState(false);
 
+  //method to edit the url with the selected fields so that the App is rerendered with the new fetched data.
   const search = () => {
     if (latlong === ",") {
+      //if the user has not selected a place, display error message
       setErrorSearch(true);
       setTimeout(() => {
         setErrorSearch(false);
@@ -31,11 +34,11 @@ export default function UserInputComponent(props) {
       latlong +
       "&sort=" +
       valueSorted +
-      "&fields=photos,categories,name,geocodes,location,distance,tel,website,hours_popular,fsq_id";
-    console.log(url);
-    setFetchUrl(url);
+      "&fields=photos,categories,name,geocodes,location,distance,tel,website,hours_popular,fsq_id,rating";
+    setFetchUrl(url); //this will trigger rerender of the fetch method in the App.js file
   };
 
+  //calling each of the components that contain the different parts of the user input
   return (
     <Grid container spacing={2}>
       <Grid item xs={6}>

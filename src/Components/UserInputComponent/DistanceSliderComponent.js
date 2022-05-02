@@ -1,14 +1,11 @@
 import React from "react";
-import Box from "@mui/material/Box";
-import Slider from "@mui/material/Slider";
-import Grid from "@mui/material/Grid";
-import Typography from "@mui/material/Typography";
+import { Box, Slider, Grid, Typography } from "@mui/material";
 
 export default function SliderComponent(props) {
   const { valueDistance, setValueDistance } = props;
 
-  const handleChange = (event, newValue) => {
-    setValueDistance(newValue);
+  const handleChange = (event) => {
+    setValueDistance(event.target.value);
   };
 
   return (
@@ -18,7 +15,7 @@ export default function SliderComponent(props) {
       </Typography>
       <Grid container spacing={2} alignItems="center">
         <Grid item>
-          <Box sx={{ width: 300 }}>
+          <Box sx={{ width: "10em" }}>
             <Slider
               onChange={handleChange}
               valueLabelDisplay="auto"

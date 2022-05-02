@@ -1,15 +1,13 @@
 import React, { useState } from "react";
 import MapOutlinedIcon from "@mui/icons-material/MapOutlined";
-import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
+import { MapContainer, TileLayer, Marker } from "react-leaflet";
 import {
   Button,
   Dialog,
   DialogActions,
   DialogContent,
-  DialogContentText,
   DialogTitle,
   Box,
-  Avatar,
   ToggleButton,
   TextField,
 } from "@mui/material/";
@@ -18,6 +16,9 @@ import { useMapEvent } from "react-leaflet/hooks";
 export default function MapCoordinatesComponent(props) {
   const { latlong, setLatlong } = props;
   const [open, setOpen] = useState(false);
+  const [latitude, setLatitude] = useState(null);
+  const [longitude, setLongitude] = useState(null);
+
   const handleClose = () => {
     setOpen(false);
   };
@@ -29,7 +30,9 @@ export default function MapCoordinatesComponent(props) {
         Math.round(e.latlng.lat * dec) / dec +
         "," +
         Math.round(e.latlng.lng * dec) / dec;
-      setLatlong(str);
+      setLatlong(str); //string with the latlng selected, rounded up to 4 decimal places
+      setLatitude(e.latlng.lat); //these 2 variables will be used to display the marker where the user clicks. Mantains all the decimal places to be completely precise
+      setLongitude(e.latlng.lng);
     });
   }
 
@@ -48,9 +51,11 @@ export default function MapCoordinatesComponent(props) {
           setOpen(true);
         }}
       >
+        {/* this will open the map on the click event */}
         <MapOutlinedIcon fontSize="large" />
       </ToggleButton>
 
+      {/* modal with the map */}
       <Dialog
         open={open}
         onClose={handleClose}
@@ -64,8 +69,6 @@ export default function MapCoordinatesComponent(props) {
             sx={{
               display: "flex",
               alignItems: "center",
-              //   pl: 1,
-              //   pb: 1,
             }}
           >
             Select Coordinates
@@ -80,6 +83,9 @@ export default function MapCoordinatesComponent(props) {
               attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
               url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
             />
+            {latitude !== null && longitude !== null ? ( //if the user has selected some coordinates, it will be shown in the marker.
+              <Marker position={[latitude, longitude]}></Marker>
+            ) : null}
           </MapContainer>
         </DialogContent>
         <DialogActions>
