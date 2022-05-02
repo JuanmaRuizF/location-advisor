@@ -1,6 +1,7 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { Container } from "@mui/material/";
+import { Container, CircularProgress, Grid } from "@mui/material/";
+import HomeIcon from "@mui/icons-material/Home";
 import { options } from "../../utils";
 import InfoCard from "../CardComponent";
 import "../../Styles/App.css";
@@ -9,6 +10,7 @@ export default function FavPlaces() {
   const [queryValues, setQueryValues] = useState([]);
   const [loaded, setLoaded] = useState(false);
   const [numberFavs, setNumberFavs] = useState(0);
+  const [tempValues, setTempValues] = useState([]);
 
   useEffect(() => {
     if (!localStorage.favElements) {
@@ -21,65 +23,79 @@ export default function FavPlaces() {
 
   useEffect(() => {
     const fetchData = async (favItems) => {
+      var arrayValues = [];
+      setTempValues([]);
       favItems.map(async (fsq_id) => {
-        let url = "https://api.foursquare.com/v3/places/" + fsq_id;
+        let url =
+          "https://api.foursquare.com/v3/places/" +
+          fsq_id +
+          "?&fields=photos,categories,name,geocodes,location,distance,tel,website,hours_popular,fsq_id";
         await fetch(url, options)
           .then((response) => response.json())
-          .then(async (response) => {
-            console.log(response);
-            let pictures = [];
-            let url_pictures =
-              "https://api.foursquare.com/v3/places/" +
-              response.fsq_id +
-              "/photos?limit=5";
-            response.pictureLinks = await fetch(url_pictures, options)
-              .then((response) => response.json())
-              .then((response) => {
-                response.map((element) => {
-                  pictures.push(element.prefix + "200x200" + element.suffix);
-                });
-                return pictures;
-              })
-              .catch((err) => console.error(err));
-            return response;
-          })
           .then((response) => {
-            setQueryValues((oldArray) => [...oldArray, response]);
-          })
-
-          .catch((err) => console.error(err));
+            setTempValues((prevArray) => [...prevArray, response]);
+          });
+        return arrayValues;
       });
     };
 
+    setLoaded(false);
     let favItems = Object.keys(JSON.parse(localStorage.favElements));
     fetchData(favItems);
-    setLoaded(true);
-  }, []);
+  }, [numberFavs]);
 
-  if (loaded) {
-    return (
-      <Container>
-        <h1>Favourite places</h1>
-        <Link to="/">TO MAIN PAGE</Link>
+  useEffect(() => {
+    if (
+      tempValues.length ===
+      Object.keys(JSON.parse(localStorage.favElements)).length
+    ) {
+      tempValues.map((element) => {
+        let pictures = [];
+        element["photos"].map((e) => {
+          pictures.push(e.prefix + "200x200" + e.suffix);
+        });
+        element.photos = pictures;
+      });
+      setQueryValues(tempValues);
+      setLoaded(true);
+    }
+  }, [tempValues]);
+
+  return (
+    <Container>
+      <Grid container spacing={2}>
+        <Grid item xs={6}>
+          <h1>Favourite places</h1>
+        </Grid>
+        <Grid item xs={6}>
+          <Link to="/">
+            <h1 className="homeButton">
+              <HomeIcon color="primary" sx={{ fontSize: 40 }} />
+            </h1>
+          </Link>
+        </Grid>
+      </Grid>
+
+      <hr></hr>
+      {loaded ? (
         <div className="resultGrid">
-          {queryValues.length > 1
-            ? queryValues.map((element, key) => {
-                console.log(element);
-                return (
-                  <InfoCard
-                    key={key}
-                    element={element}
-                    id={key}
-                    setNumberFavs={setNumberFavs}
-                    isFavPage={true}
-                  ></InfoCard>
-                );
-              })
-            : null}
+          {queryValues.map((element, key) => {
+            return (
+              <InfoCard
+                key={key}
+                element={element}
+                id={key}
+                setNumberFavs={setNumberFavs}
+                isFavPage={true}
+              ></InfoCard>
+            );
+          })}
         </div>
-      </Container>
-    );
-  } else {
-    return <h3>Loading...</h3>;
-  }
+      ) : (
+        <div className="loadingComponent">
+          <CircularProgress size="8rem" />
+        </div>
+      )}
+    </Container>
+  );
 }

@@ -52,3 +52,31 @@
     width: 100%;
     height: 30vh;
 }
+
+.favButton {
+    text-align: right;
+}
+
+.homeButton {
+    text-align: right;
+    padding-top: 1%;
+}
+
+.Search {
+    text-align: right;
+}
+
+.separatingBar {
+    margin-bottom: 3%;
+}
+
+.errorText {
+    text-align: center;
+    color: red;
+    font-weight: bold;
+}
+
+.loadingComponent {
+    text-align: center;
+    margin-top: 10%;
+}
