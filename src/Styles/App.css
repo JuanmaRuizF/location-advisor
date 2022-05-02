@@ -80,3 +80,19 @@
     text-align: center;
     margin-top: 10%;
 }
+
+.gridItem {
+    padding-bottom: 5%;
+    padding-left: 2%;
+}
+
+.gridContainer {
+    align-items: center;
+    justify-content: center;
+    display: flex;
+    align-items: stretch;
+}
+
+.rating {
+    text-align: center;
+}
