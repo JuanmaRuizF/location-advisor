@@ -1,13 +1,13 @@
 {
   "files": {
     "main.css": "/location-advisor/static/css/main.bacb7254.css",
-    "main.js": "/location-advisor/static/js/main.9fa8c704.js",
+    "main.js": "/location-advisor/static/js/main.62a3c621.js",
     "index.html": "/location-advisor/index.html",
     "main.bacb7254.css.map": "/location-advisor/static/css/main.bacb7254.css.map",
-    "main.9fa8c704.js.map": "/location-advisor/static/js/main.9fa8c704.js.map"
+    "main.62a3c621.js.map": "/location-advisor/static/js/main.62a3c621.js.map"
   },
   "entrypoints": [
     "static/css/main.bacb7254.css",
-    "static/js/main.9fa8c704.js"
+    "static/js/main.62a3c621.js"
   ]
 }
