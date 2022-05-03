@@ -15,7 +15,8 @@ export default function SliderComponent(props) {
       </Typography>
       <Grid container spacing={2} alignItems="center">
         <Grid item>
-          <Box sx={{ width: "10em" }}>
+          {/* <Box sx={{ width: "10em" }}> */}
+          <Box sx={{ width: 300 }}>
             <Slider
               onChange={handleChange}
               valueLabelDisplay="auto"

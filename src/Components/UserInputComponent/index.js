@@ -41,26 +41,26 @@ export default function UserInputComponent(props) {
   //calling each of the components that contain the different parts of the user input
   return (
     <Grid container spacing={2}>
-      <Grid item xs={6}>
+      <Grid item xs={12} sm={12} md={6} lg={6} xl={6} marginBottom={1}>
         <MapCoordinatesComponent
           latlong={latlong}
           setLatlong={setLatlong}
         ></MapCoordinatesComponent>
       </Grid>
 
-      <Grid item xs={6}>
+      <Grid xs={12} sm={12} md={6} lg={6} xl={6} marginBottom={1}>
         <SortByComponent
           valueSorted={valueSorted}
           setValueSorted={setValueSorted}
         ></SortByComponent>
       </Grid>
-      <Grid item xs={6}>
+      <Grid xs={12} sm={12} md={6} lg={6} xl={6}>
         <DistanceSlider
           valueDistance={valueDistance}
           setValueDistance={setValueDistance}
         ></DistanceSlider>
       </Grid>
-      <Grid item xs={6}>
+      <Grid xs={12} sm={12} md={6} lg={6} xl={6}>
         <NumberElementsSliderComponent
           numberElements={numberElements}
           setNumberElements={setNumberElements}
