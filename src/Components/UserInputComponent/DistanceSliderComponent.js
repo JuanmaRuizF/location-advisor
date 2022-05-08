@@ -11,7 +11,7 @@ export default function SliderComponent(props) {
   return (
     <>
       <Typography id="input-slider" gutterBottom>
-        Radius for search
+        Search Radius
       </Typography>
       <Grid container spacing={2} alignItems="center">
         <Grid item>

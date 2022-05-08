@@ -11,7 +11,7 @@ export default function SliderComponent(props) {
   return (
     <>
       <Typography id="input-slider" gutterBottom>
-        Number of elements to return
+        Number of elements to display
       </Typography>
       <Grid container spacing={2} alignItems="center">
         <Grid item>
